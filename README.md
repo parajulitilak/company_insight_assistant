@@ -101,7 +101,7 @@ company_insight_assistant/
 
 ### Prerequisites
 
-- **Python 3.13**
+- **Python 3.13.3**
 - **Docker**: For containerized deployment.
 - **Git**: For version control.
 
