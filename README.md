@@ -1,42 +1,51 @@
-<<<<<<< HEAD
-# company_insight_assistant
-Retrieval-Augmented Generation (RAG) prototype using FastAPI, Selenium, and Ollama — built with 12-Factor App principles, containerized with Docker, and powered by LLMs for querying real-time company data.
-=======
-# RAG Fusemachines Job Assistant
+# Company Insight Assistant
 
-A **FastAPI** microservice implementing a **Retrieval-Augmented Generation (RAG)** system to scrape, store, and intelligently query job listings from [Fusemachines](https://fusemachines.com/). Built with a modern, modular architecture, powered by **Ollama** for embeddings and text generation, and adhering to the [Twelve-Factor App](https://12factor.net/) methodology.
+A **FastAPI** microservice implementing a **Retrieval-Augmented Generation (RAG)** system to scrape, store, and intelligently query job listings from [Fusemachines](https://fusemachines.com/). Built with a modern, modular architecture, powered by **Ollama** for embeddings and text generation, and adhering to the [Twelve-Factor App](https://12factor.net/) methodology. Containerized with Docker and integrated with GitHub Actions for CI/CD.
 
 ![CCDS Template](https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter)
 
 ## Features
 
 - **RAG Pipeline**: Scrapes job listings, indexes them with semantic embeddings, and answers queries using generative AI.
-- **FastAPI Backend**: RESTful API with endpoints for scraping, querying, and retrieving jobs.
-- **Ollama Integration**: Uses `bge-base-en-v1.5-gguf` for embeddings and `Llama-3.2-1B-Instruct-GGUF` for response generation.
-- **Selenium**: Scrapes dynamic content from the Fusemachines careers page.
-- **SQLite**: Lightweight storage for job listings and embeddings.
-- **Dockerized**: Ensures portability and consistent deployment.
-- **Logging**: Uses `loguru` for event streams.
-- **Testing**: Unit tests with `pytest` for reliability.
-- **CI/CD Ready**: Configured with pre-commit hooks and GitHub Actions support.
+- **FastAPI Backend**: RESTful API for scraping, querying, and retrieving jobs.
+- **Ollama Integration**: Uses `bge-base-en-v1.5-gguf` for embeddings and `Llama-3.2-1B-Instruct-GGUF` for responses, served via a dedicated `ollama` container.
+- **Selenium**: Scrapes dynamic content from the Fusemachines careers page in headless mode.
+- **SQLite**: Stores job listings and embeddings in `data/jobs.db`.
+- **Dockerized**: Multi-service setup with `web`, `ollama`, and `mkdocs` containers.
+- **Logging**: Configured with `loguru` for detailed event streams.
+- **Testing**: Unit tests in `tests/` using `pytest`.
+- **CI/CD**: GitHub Actions workflow for automated testing.
+- **Documentation**: MkDocs with 12-Factor App principles and project details.
 - Follows **Twelve-Factor App** principles for scalability and maintainability.
 
 ## Project Structure
 
 ```bash
-rag_fusemachines/
-├── app/                    # FastAPI application code
-│   ├── __init__.py
+company_insight_assistant/
+├── app/                            # FastAPI application code
 │   ├── crud.py
 │   ├── database.py
 │   ├── logging_config.py
 │   ├── main.py
 │   ├── models.py
+│   ├── rag_model.py
 │   ├── schemas.py
-│   └── rag_model.py
-├── data/                   # SQLite database
+│   └── __pycache__/
+├── company_insight_assistant/      # Data science utilities
+│   ├── config.py
+│   ├── dataset.py
+│   ├── features.py
+│   ├── plots.py
+│   └── modeling/
+│       ├── predict.py
+│       └── train.py
+├── data/                           # Data storage
+│   ├── external/
+│   ├── interim/
+│   ├── processed/
+│   ├── raw/
 │   └── jobs.db
-├── docs/                   # MkDocs documentation
+├── docs/                           # MkDocs documentation
 │   ├── 12-factor-app/
 │   │   ├── admin.md
 │   │   ├── backing.md
@@ -46,76 +55,72 @@ rag_fusemachines/
 │   │   ├── config.md
 │   │   ├── dependency.md
 │   │   ├── disposability.md
+│   │   ├── index.md
 │   │   ├── logging.md
 │   │   ├── overview.md
 │   │   ├── parity.md
 │   │   ├── port.md
 │   │   └── stateless.md
+│   ├── css/
+│   │   └── extra.css
 │   ├── index.md
+│   ├── mkdocs.yml
 │   └── rag_project.md
-├── scripts/                # Admin scripts
+├── logs/                           # Log files
+│   └── info.log
+├── models/                         # Model artifacts
+├── notebooks/                      # Jupyter notebooks
+│   └── rag_scraper_prototype.ipynb
+├── references/                     # Reference materials
+├── reports/                        # Reports and figures
+│   └── figures/
+├── scripts/                        # Utility scripts
 │   └── scrape_index_jobs.py
-├── tests/                  # Unit tests
-│   └── test.py
-├── css/                    # Custom CSS for MkDocs
-│   └── extra.css
-├── .env                    # Environment variables
-├── .gitignore              # Git ignore rules
-├── .pre-commit-config.yaml # Pre-commit hooks
-├── docker-compose.yml      # Docker Compose configuration
-├── Dockerfile              # Docker image definition
-├── install-extensions.sh    # VS Code extensions
-├── mkdocs.yml              # MkDocs configuration
-├── pytest.ini              # Pytest configuration
-├── requirements.txt        # Dependencies
-└── README.md               # Project overview
+├── tests/                          # Unit tests
+│   ├── test.py
+│   └── test_data.py
+├── site/                           # MkDocs generated site
+├── .gitignore                      # Git ignore rules
+├── .pre-commit-config.yaml         # Pre-commit hooks
+├── docker-compose.yml              # Docker Compose configuration
+├── Dockerfile                      # Web service Docker image
+├── Dockerfile.mkdocs               # MkDocs service Docker image
+├── install-extensions.sh            # VS Code extensions
+├── LICENSE                         # MIT License
+├── Makefile                        # Build automation
+├── mkdocs.yml                      # MkDocs configuration
+├── ollama_setup.sh                 # FastAPI startup script
+├── pyproject.toml                  # Project metadata
+├── pytest.ini                      # Pytest configuration
+├── README.md                       # Project overview
+├── requirements.txt                # Dependencies
+├── verify_ollama.sh                # Ollama verification script
 ```
 
 ## Setup & Installation
 
-### 1. Install Ollama and Models
+### Prerequisites
 
-Install [Ollama](https://ollama.com) and pull the required models:
+- **Python 3.13**
+- **Docker**: For containerized deployment.
+- **Git**: For version control.
 
-```bash
-ollama pull hf.co/CompendiumLabs/bge-base-en-v1.5-gguf
-ollama pull hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF
-```
-
-Start the Ollama server:
+### 1. Clone the Repository
 
 ```bash
-ollama serve
+git clone https://github.com/parajulitilak/company_insight_assistant.git
+cd company_insight_assistant
 ```
 
-### 2. System Requirements
+### 2. Configure Environment
 
-- **Python 3.10**
-- **Geckodriver**: Install for Firefox automation and add to your `PATH` ([instructions](https://firefox-source-docs.mozilla.org/testing/geckodriver/)).
-- **Docker**: Optional, for containerized deployment.
-
-### 3. Create and Activate Virtual Environment
-
-```bash
-python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
-```
-
-### 4. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 5. Configure Environment
-
-Copy the example environment file and edit as needed:
+Create a `.env` file:
 
 ```bash
 cp .env.example .env
 ```
 
-Ensure your `.env` includes:
+Edit `.env`:
 
 ```env
 DATABASE_URL=sqlite:///./data/jobs.db
@@ -126,10 +131,43 @@ HOST=0.0.0.0
 OLLAMA_HOST=http://localhost:11434
 ```
 
-### 6. Install Pre-commit Hooks
+### 3. Install Dependencies (Local)
+
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 4. Install Pre-commit Hooks
 
 ```bash
 pre-commit install
+```
+
+### 5. Run with Docker
+
+Build and start services (`ollama`, `web`, `mkdocs`):
+
+```bash
+docker compose up --build
+```
+
+- **Ollama**: Runs on `http://localhost:11434`.
+- **FastAPI**: Runs on `http://localhost:9000`.
+- **MkDocs**: Runs on `http://localhost:9090`.
+
+Manually pull Ollama models (if not already pulled):
+
+```bash
+docker exec ollama ollama pull hf.co/CompendiumLabs/bge-base-en-v1.5-gguf
+docker exec ollama ollama pull hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF
+```
+
+Verify Ollama:
+
+```bash
+./verify_ollama.sh
 ```
 
 ## Running the Application
@@ -143,10 +181,10 @@ uvicorn app.main:app --host 0.0.0.0 --port 9000
 ### With Docker
 
 ```bash
-docker-compose up --build
+docker compose up -d
 ```
 
-To run the admin script in Docker:
+Run the scraping script:
 
 ```bash
 docker exec -it rag_fusemachines python scripts/scrape_index_jobs.py
@@ -159,6 +197,7 @@ docker exec -it rag_fusemachines python scripts/scrape_index_jobs.py
 | POST   | `/scrape/` | Scrapes and indexes job listings      | None                                     |
 | POST   | `/query/`  | Queries jobs using RAG pipeline       | `{"query": "Data Scientist jobs"}`       |
 | GET    | `/jobs/`   | Returns all stored job listings       | None                                     |
+| GET    | `/health/` | Checks API health                     | None                                     |
 
 ### Example Queries
 
@@ -176,63 +215,80 @@ curl -X POST http://localhost:9000/query/ \
   -d '{"query": "What data scientist jobs are available?"}'
 ```
 
-#### List All Jobs
+#### List Jobs
 
 ```bash
 curl http://localhost:9000/jobs/
 ```
 
+#### Health Check
+
+```bash
+curl http://localhost:9000/health/
+```
+
 ## Scripts
 
-- **`scripts/scrape_index_jobs.py`**: Manually scrape and index job listings.
+- **`scripts/scrape_index_jobs.py`**: Scrapes and indexes job listings.
 
 ```bash
 python scripts/scrape_index_jobs.py
 ```
 
-## Running Tests
+## Testing
 
-Run unit tests to verify functionality:
+Run unit tests:
 
 ```bash
-pytest
+pytest tests/ -v
+```
+
+In Docker:
+
+```bash
+docker exec rag_fusemachines pytest tests/ -v
 ```
 
 ## Documentation
 
-View project documentation using MkDocs:
-
-1. Install MkDocs:
-
-```bash
-pip install mkdocs
-```
-
-2. Serve documentation:
+Serve MkDocs locally:
 
 ```bash
 mkdocs serve
 ```
 
-3. Access at `http://localhost:9090`.
-
-Alternatively, use the `mkdocs` service in `docker-compose.yml`:
+Or use Docker:
 
 ```bash
-docker-compose up mkdocs
+docker compose up mkdocs
 ```
 
-Documentation includes:
-- Project overview and setup (`docs/index.md`, `docs/rag_project.md`).
-- Twelve-Factor App principles (`docs/12-factor-app/`).
+Access at `http://localhost:9090`. Includes:
+- Project overview (`docs/index.md`, `docs/rag_project.md`).
+- 12-Factor App principles (`docs/12-factor-app/`).
+
+## Development Workflow
+
+- **Branching**: Uses `main` (production) and `develop` (integration). Create `feature/*` or `fix/*` branches from `develop`.
+- **Commits**: Use descriptive messages (e.g., `Add GitHub Actions CI workflow`).
+- **CI/CD**: GitHub Actions (`ci.yml`) runs tests on push/PR to `main` or `develop`.
+- **PRs**: Create pull requests from `develop` to `main` after tests pass.
+
+## Contributing
+
+1. Fork the repository.
+2. Create a `feature/*` or `fix/*` branch.
+3. Commit changes and run tests.
+4. Push and open a PR to `develop`.
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+MIT License. See `LICENSE` for details.
 
 ## Credits
 
-- Inspired by the [Cookiecutter Data Science](https://drivendata.github.io/cookiecutter-data-science/) template.
-- Based on the Hugging Face article [Code a simple RAG from scratch](https://huggingface.co/blog/ngxson/make-your-own-rag).
+- Inspired by [Cookiecutter Data Science](https://drivendata.github.io/cookiecutter-data-science/).
+- Based on [Hugging Face RAG tutorial](https://huggingface.co/blog/ngxson/make-your-own-rag).
 - Built for the Fusemachines AI Fellowship 2025.
->>>>>>> 8841274 (Initial commit with FastAPI, Ollama, and MkDocs setup)
+
+
