@@ -1,0 +1,53 @@
+services:
+    web:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: rag_fusemachines
+        ports:
+            - "9000:9000"
+            - "11434:11434"  # Expose Ollama port
+        volumes:
+            - ./data:/app/data
+            - ./app:/app/app
+            - ./logs:/app/logs
+            - ./ollama_setup.sh:/app/ollama_setup.sh
+            - ollama_storage:/root/.ollama
+        entrypoint: ["/bin/bash", "-c", "/app/ollama_setup.sh"]
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 180s  # Allow time for model pulling
+        networks:
+            - app-network
+
+    mkdocs:
+        build:
+            context: .
+            dockerfile: Dockerfile.mkdocs
+        container_name: mkdocs
+        ports:
+            - "9090:9090"
+        volumes:
+            - ./docs:/app/docs
+            - ./mkdocs.yml:/app/mkdocs.yml
+            - ./docs/css:/app/css
+        command: mkdocs serve --dev-addr=0.0.0.0:9090
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:9090"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+        networks:
+            - app-network
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    ollama_storage:

@@ -1,0 +1,21 @@
+/* Override ReadTheDocs primary color */
+.wy-side-nav-search,
+.wy-nav-top {
+  background: #3d3f64; /* deep red */
+}
+
+a,
+a:hover,
+a:focus {
+  color: #ffffff;
+}
+
+/* Override white text issue */
+body, .md-content {
+    color: #333;  /* Dark gray text */
+}
+
+/* Fix white text in headings */
+h1, h2, h3, h4, h5, h6 {
+    color: #333;
+}

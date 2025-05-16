@@ -1,0 +1,29 @@
+
+#### 2. `mkdocs.yml`
+Configures MkDocs for documentation, based on the reference project.
+
+```yaml
+site_name: RAG Fusemachines Job Assistant
+site_description: A FastAPI-based RAG system for querying Fusemachines job listings.
+nav:
+  - Getting Started:
+      - Overview: index.md
+      - Project Setup: rag_project.md
+  - 12 Factor App Principles:
+      - Overview: 12-factor-app/overview.md
+      - 1. Codebase: 12-factor-app/codebase.md
+      - 2. Dependencies: 12-factor-app/dependency.md
+      - 3. Config: 12-factor-app/config.md
+      - 4. Backing Services: 12-factor-app/backing.md
+      - 5. Build, Release, Run: 12-factor-app/build.md
+      - 6. Processes: 12-factor-app/stateless.md
+      - 7. Port Binding: 12-factor-app/port.md
+      - 8. Concurrency: 12-factor-app/concurrency.md
+      - 9. Disposability: 12-factor-app/disposability.md
+      - 10. Dev/Prod Parity: 12-factor-app/parity.md
+      - 11. Logs: 12-factor-app/logging.md
+      - 12. Admin Processes: 12-factor-app/admin.md
+theme:
+  name: readthedocs
+extra_css:
+  - css/extra.css

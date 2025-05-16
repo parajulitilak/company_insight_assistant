@@ -1,0 +1,32 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "company_insight_assistant"
+version = "0.0.1"
+description = "A FastAPI microservice that implements a Retrieval-Augmented Generation (RAG) system to scrape and store company website data, then intelligently answers user queries using that information. Built with a modular architecture following 12-Factor App principles, it features environment-based configuration, Docker support, automated testing, GitHub Actions CI/CD, and modern development workflows for scalability and maintainability."
+authors = [
+  { name = "Tilak Parajuli" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License"
+]
+requires-python = "~=3.11.0"
+
+
+[tool.ruff]
+line-length = 99
+src = ["company_insight_assistant"]
+include = ["pyproject.toml", "company_insight_assistant/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["company_insight_assistant"]
+force-sort-within-sections = true
+
