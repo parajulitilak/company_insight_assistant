@@ -19,7 +19,7 @@ jobs:
         ports:
           - 11434:11434
         volumes:
-          - ollama_storage:/root/.ollama
+          - ./ollama_storage:/root/.ollama
         options: --name ollama
     steps:
       - name: Checkout code
@@ -64,6 +64,3 @@ jobs:
         with:
           name: pytest-report
           path: pytest_report.xml
-
-volumes:
-  ollama_storage:
