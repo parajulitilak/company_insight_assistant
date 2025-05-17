@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      ollama:
+        image: ollama/ollama:latest
+        ports:
+          - 11434:11434
+        volumes:
+          - ./ollama_storage:/root/.ollama
+        options: --name ollama
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker images
+        run: |
+          docker compose build
+
+      - name: Start services
+        run: |
+          docker compose up -d
+
+      - name: Wait for Ollama to be ready
+        run: |
+          timeout 120 bash -c 'until curl -f http://localhost:11434 > /dev/null 2>&1; do
+            echo "Waiting for Ollama server to start..."
+            sleep 2
+          done'
+
+      - name: Pull Ollama models with retries
+        run: |
+          for i in {1..3}; do
+            docker exec ollama ollama pull hf.co/CompendiumLabs/bge-base-en-v1.5-gguf && break || sleep 5
+          done || docker exec ollama ollama pull bge-small-en-v1.5
+          for i in {1..3}; do
+            docker exec ollama ollama pull hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF && break || sleep 5
+          done || docker exec ollama ollama pull llama3
+
+      - name: Run tests
+        env:
+          CI: true
+        run: |
+          docker exec rag_fusemachines pytest tests/ -v --junitxml=pytest_report.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report
+          path: pytest_report.xml
